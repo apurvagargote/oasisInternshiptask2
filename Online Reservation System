@@ -1,0 +1,195 @@
+package task2;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+
+class User {
+    private String username;
+    private String password;
+
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public boolean authenticate(String enteredPassword) {
+        return password.equals(enteredPassword);
+    }
+}
+
+class Reservation {
+    private String trainNumber;
+    private String trainName;
+    private String classType;
+    private String dateOfJourney;
+    private String source;
+    private String destination;
+
+    public Reservation(String trainNumber, String trainName, String classType, String dateOfJourney, String source, String destination) {
+        this.trainNumber = trainNumber;
+        this.trainName = trainName;
+        this.classType = classType;
+        this.dateOfJourney = dateOfJourney;
+        this.source = source;
+        this.destination = destination;
+    }
+
+    public String getTrainNumber() {
+        return trainNumber;
+    }
+
+    public String getTrainName() {
+        return trainName;
+    }
+
+    public String getClassType() {
+        return classType;
+    }
+
+    public String getDateOfJourney() {
+        return dateOfJourney;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public String getDestination() {
+        return destination;
+    }
+}
+
+class ReservationSystem {
+    private static Scanner scanner = new Scanner(System.in);
+    private static Map<String, User> users = new HashMap<>();
+    private static Map<String, Reservation> reservations = new HashMap<>();
+
+    public static void main(String[] args) {
+        // Sample users
+        users.put("user1", new User("user1", "password1"));
+        users.put("user2", new User("user2", "password2"));
+
+        while (true) {
+            System.out.println("1. Login");
+            System.out.println("2. Exit");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    login();
+                    break;
+                case 2:
+                    System.out.println("Exiting the Online Reservation System. Goodbye!");
+                    System.exit(0);
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+
+    private static void login() {
+        System.out.print("Enter username: ");
+        String username = scanner.next();
+        System.out.print("Enter password: ");
+        String password = scanner.next();
+
+        User user = users.get(username);
+
+        if (user != null && user.authenticate(password)) {
+            System.out.println("Login successful!");
+            showReservationMenu();
+        } else {
+            System.out.println("Invalid username or password. Please try again.");
+        }
+    }
+
+    private static void showReservationMenu() {
+        while (true) {
+            System.out.println("\nReservation Menu:");
+            System.out.println("1. Make a Reservation");
+            System.out.println("2. Cancel Reservation");
+            System.out.println("3. Logout");
+
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    makeReservation();
+                    break;
+                case 2:
+                    cancelReservation();
+                    break;
+                case 3:
+                    System.out.println("Logging out. Thank you!");
+                    return;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+
+    private static void makeReservation() {
+        System.out.println("\nMake a Reservation:");
+        System.out.print("Enter train number: ");
+        String trainNumber = scanner.next();
+        System.out.print("Enter train name: ");
+        String trainName = scanner.next();
+        System.out.print("Enter class type: ");
+        String classType = scanner.next();
+        System.out.print("Enter date of journey: ");
+        String dateOfJourney = scanner.next();
+        System.out.print("Enter source: ");
+        String source = scanner.next();
+        System.out.print("Enter destination: ");
+        String destination = scanner.next();
+
+        Reservation reservation = new Reservation(trainNumber, trainName, classType, dateOfJourney, source, destination);
+        reservations.put(generatePNR(), reservation);
+
+        System.out.println("Reservation successful!\n");
+    }
+
+    private static void cancelReservation() {
+        System.out.print("Enter PNR number to cancel reservation: ");
+        String pnr = scanner.next();
+
+        Reservation reservation = reservations.get(pnr);
+
+        if (reservation != null) {
+            displayReservationDetails(reservation);
+            System.out.print("Press 'OK' to confirm cancellation or any other key to cancel: ");
+            String confirmation = scanner.next();
+
+            if (confirmation.equalsIgnoreCase("OK")) {
+                reservations.remove(pnr);
+                System.out.println("Reservation canceled successfully!");
+            } else {
+                System.out.println("Reservation cancellation aborted.");
+            }
+        } else {
+            System.out.println("Invalid PNR number. No reservation found.");
+        }
+    }
+
+    private static void displayReservationDetails(Reservation reservation) {
+        System.out.println("\nReservation Details:");
+        System.out.println("Train Number: " + reservation.getTrainNumber());
+        System.out.println("Train Name: " + reservation.getTrainName());
+        System.out.println("Class Type: " + reservation.getClassType());
+        System.out.println("Date of Journey: " + reservation.getDateOfJourney());
+        System.out.println("Source: " + reservation.getSource());
+        System.out.println("Destination: " + reservation.getDestination());
+    }
+
+    private static String generatePNR() {
+        // This is a basic PNR generation logic, you might want to implement a more sophisticated one
+        return "PNR" + System.currentTimeMillis();
+    }
+}
